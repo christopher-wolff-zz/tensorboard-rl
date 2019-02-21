@@ -25,7 +25,7 @@ limitations under the License.
 <link rel="import" href="arrays-card.html">
 
 <!--
-  A frontend that displays a set of greeter-cards.
+  A frontend that displays a set of array-cards.
 -->
 <dom-module id="arrays-dashboard">
   <template>
@@ -59,7 +59,7 @@ limitations under the License.
               >
                 <template is="dom-repeat" items="[[category._pages]]" as="page">
                   <template is="dom-if" if="[[page.active]]">
-                    <div class="layout horizontal wrap">
+                    <div class="layout vertical">
                       <template is="dom-repeat" items="[[page.items]]">
                         <arrays-card
                           run="[[item.run]]"

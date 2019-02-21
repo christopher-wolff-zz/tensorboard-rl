@@ -8,6 +8,30 @@
 
 <dom-module id="arrays-card">
   <template>
+    <tf-card-heading title="[[tag]]" run="[[run]]" color="[[_runColor]]">
+    </tf-card-heading>
+    <div>
+      Array Display [[step]]
+    </div>
+    <div id="options">
+      <div id="step-label">Step</div>
+      <paper-slider
+        pin
+        id="slider"
+        label="Step"
+        min="0"
+        max="100"
+        type="number"
+        value="{{step}}"
+      ></paper-slider>
+      <paper-input
+        label="Rows"
+        always-float-label
+        placeholder="e.g. 0, 1, 2"
+        auto-validate pattern="^[0-9]+(,\s?[0-9]+)*$"
+        error-message="invalid format"
+      ></paper-input>
+    </div>
     <style>
       :host {
         display: flex;
@@ -17,35 +41,24 @@
         margin-right: 10px;
         margin-bottom: 15px;
       }
+
       :host[_expanded] {
         width: 700px;
         height: 500px;
       }
-    </style>
-    <tf-card-heading title="[[tag]]" color="[[_runColor]]">
-      [[run]]
-    </tf-card-heading>
-    <div>
-      Array Display [[step]]
-    </div>
-    <div>
-      <paper-slider
-        pin
-        id="slider"
-        min="0"
-        max="100"
-        type="number"
-        value="{{step}}"
-      ></paper-slider>
-      <paper-input
-        label="Rows"
-        always-float-label
-        placeholder="e.g. :4, 5:7, -2:"
-        auto-validate pattern="[a-zA-Z]*"
-        error-message="invalid format"
-      ></paper-input>
 
-    </div>
+      #options {
+        display: flex;
+        flex-direction: row;
+      }
+
+      #step-label {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        font-size: 14px;
+      }
+    </style>
   </template>
   <script>
     "use strict";
@@ -77,6 +90,7 @@
       _computeRunColor(run) {
         return this._colorScaleFunction(run);
       },
+
       attached() {
         // Defer reloading until after we're attached, because that ensures that
         // the requestManager has been set from above. (Polymer is tricky
@@ -84,9 +98,11 @@
         this._attached = true;
         this.reload();
       },
+
       reload() {
         this._fetchNewData(this.run, this.tag);
       },
+
       _fetchNewData(run, tag) {
         if (!this._attached) {
           return;
