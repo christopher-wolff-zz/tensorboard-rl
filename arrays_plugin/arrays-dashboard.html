@@ -22,12 +22,12 @@ limitations under the License.
 <link rel="import" href="../tf-dashboard-common/tf-dashboard-layout.html">
 <link rel="import" href="../tf-runs-selector/tf-runs-selector.html">
 <link rel="import" href="../tf-tensorboard/registry.html">
-<link rel="import" href="greeter-card.html">
+<link rel="import" href="arrays-card.html">
 
 <!--
   A frontend that displays a set of greeter-cards.
 -->
-<dom-module id="greeter-dashboard">
+<dom-module id="arrays-dashboard">
   <template>
     <tf-dashboard-layout>
       <div class="sidebar">
@@ -35,32 +35,17 @@ limitations under the License.
           <tf-runs-selector selected-runs="{{_selectedRuns}}">
           </tf-runs-selector>
         </div>
-       </div>
       </div>
       <div class="center">
         <template is="dom-if" if="[[_dataNotFound]]">
           <div class="no-data-warning">
-            <h3>No greeter data was found.</h3>
-            <p>Probable causes:</p>
-            <ul>
-              <li>You haven’t written any greeter data to your event files.
-              <li>TensorBoard can’t find your event files.
-            </ul>
-            <p>
-            If you’re new to using TensorBoard, and want to find out how
-            to add data and set up your event files, check out the
-            <a href="https://github.com/tensorflow/tensorboard/blob/master/README.md">README</a>
-            and perhaps the <a href="https://www.tensorflow.org/get_started/summaries_and_tensorboard">TensorBoard tutorial</a>.
-            <p>
-            If you think TensorBoard is configured properly, please see
-            <a href="https://github.com/tensorflow/tensorboard/blob/master/README.md#my-tensorboard-isnt-showing-any-data-whats-wrong">the section of the README devoted to missing data problems</a>
-            and consider filing an issue on GitHub.
+            <h3>No array data was found.</h3>
           </div>
         </template>
         <template is="dom-if" if="[[!_dataNotFound]]">
           <paper-input
             no-label-float
-            label="Filter tags (regular expressions supported)"
+            label="Filter tags (regex supported)"
             value="{{_tagFilter}}"
             class="search-input"
           >
@@ -76,11 +61,11 @@ limitations under the License.
                   <template is="dom-if" if="[[page.active]]">
                     <div class="layout horizontal wrap">
                       <template is="dom-repeat" items="[[page.items]]">
-                        <greeter-card
+                        <arrays-card
                           run="[[item.run]]"
                           tag="[[item.tag]]"
                           request-manager="[[_requestManager]]"
-                          ></greeter-card>
+                          ></arrays-card>
                       </template>
                     </div>
                   </template>
@@ -105,7 +90,7 @@ limitations under the License.
     "use strict";
 
     Polymer({
-      is: "greeter-dashboard",
+      is: "arrays-dashboard",
       properties: {
         _selectedRuns: Array,
         _runToTag: Object,  // map<run: string, tags: string[]>
@@ -133,7 +118,7 @@ limitations under the License.
         });
       },
       _fetchTags() {
-        const url = tf_backend.getRouter().pluginRoute('greeter', '/tags');
+        const url = tf_backend.getRouter().pluginRoute('arrays', '/tags');
         return this._requestManager.request(url).then(runToTag => {
           if (_.isEqual(runToTag, this._runToTag)) {
             // No need to update anything if there are no changes.
@@ -145,7 +130,7 @@ limitations under the License.
         });
       },
       _reloadCards() {
-        this.querySelectorAll('greeter-card').forEach(g => {
+        this.querySelectorAll('arrays-card').forEach(g => {
           g.reload();
         });
       },
@@ -155,8 +140,8 @@ limitations under the License.
     });
 
     tf_tensorboard.registerDashboard({
-      plugin: 'greeter',
-      elementName: 'greeter-dashboard',
+      plugin: 'arrays',
+      elementName: 'arrays-dashboard',
     });
 
   </script>

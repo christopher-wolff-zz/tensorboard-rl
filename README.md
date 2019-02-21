@@ -1,3 +1,4 @@
-# QViz
+# TensorBoard RL
 
-A TensorBoard plugin for visualizing Q-functions.
+An extension of TensorBoard that includes a suite of plugins for reinforcement
+learning.
