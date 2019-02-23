@@ -9,8 +9,8 @@ tf_web_library(
     srcs = [
         "arrays-card.html",
         "arrays-dashboard.html",
-        "arrays-data-loader.html",
-        "heat-map.html",
+        "vz-rectangle-plot.html",
+        "vz-rectangle-plot.ts",
     ],
     path = "/arrays_plugin/arrays_dashboard",
     deps = [
@@ -24,9 +24,11 @@ tf_web_library(
         "@org_tensorflow_tensorboard//tensorboard/components/tf_dashboard_common",
         "@org_tensorflow_tensorboard//tensorboard/components/tf_imports:d3",
         "@org_tensorflow_tensorboard//tensorboard/components/tf_imports:lodash",
+        "@org_tensorflow_tensorboard//tensorboard/components/tf_imports:plottable",
         "@org_tensorflow_tensorboard//tensorboard/components/tf_imports:polymer",
         "@org_tensorflow_tensorboard//tensorboard/components/tf_paginated_view",
         "@org_tensorflow_tensorboard//tensorboard/components/tf_runs_selector",
         "@org_tensorflow_tensorboard//tensorboard/components/tf_tensorboard:registry",
+        "@org_tensorflow_tensorboard//tensorboard/components/vz_chart_helpers"
     ],
 )
