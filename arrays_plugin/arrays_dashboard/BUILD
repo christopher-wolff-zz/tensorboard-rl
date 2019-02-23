@@ -9,6 +9,8 @@ tf_web_library(
     srcs = [
         "arrays-card.html",
         "arrays-dashboard.html",
+        "arrays-data-loader.html",
+        "heat-map.html",
     ],
     path = "/arrays_plugin/arrays_dashboard",
     deps = [
@@ -20,6 +22,7 @@ tf_web_library(
         "@org_tensorflow_tensorboard//tensorboard/components/tf_categorization_utils",
         "@org_tensorflow_tensorboard//tensorboard/components/tf_color_scale",
         "@org_tensorflow_tensorboard//tensorboard/components/tf_dashboard_common",
+        "@org_tensorflow_tensorboard//tensorboard/components/tf_imports:d3",
         "@org_tensorflow_tensorboard//tensorboard/components/tf_imports:lodash",
         "@org_tensorflow_tensorboard//tensorboard/components/tf_imports:polymer",
         "@org_tensorflow_tensorboard//tensorboard/components/tf_paginated_view",

@@ -4,14 +4,17 @@
 <link rel="import" href="../../tf-card-heading/tf-card-heading.html">
 <link rel="import" href="../../tf-color-scale/tf-color-scale.html">
 <link rel="import" href="../../tf-imports/lodash.html">
+<link rel="import" href="arrays-data-loader.html">
 
 
 <dom-module id="arrays-card">
   <template>
     <tf-card-heading title="[[tag]]" run="[[run]]" color="[[_runColor]]">
     </tf-card-heading>
-    <div>
-      Array Display [[step]]
+    <div id="arrays-data-loader-container">
+      <arrays-data-loader
+        active="[[active]]"
+      >[ARRAY DATA]</arrays-data-loader>
     </div>
     <div id="options">
       <div id="step-label">Step</div>
@@ -31,19 +34,27 @@
         auto-validate pattern="^[0-9]+(,\s?[0-9]+)*$"
         error-message="invalid format"
       ></paper-input>
+      <div style="width: 20px"></div>
+      <paper-input
+        label="Columns"
+        always-float-label
+        placeholder="e.g. 0, 1, 2"
+        auto-validate pattern="^[0-9]+(,\s?[0-9]+)*$"
+        error-message="invalid format"
+      ></paper-input>
     </div>
     <style>
       :host {
         display: flex;
         flex-direction: column;
-        width: 330px;
+        width: 100%;
         height: 235px;
         margin-right: 10px;
         margin-bottom: 15px;
       }
 
       :host[_expanded] {
-        width: 700px;
+        width: 100%;
         height: 500px;
       }
 
@@ -58,6 +69,14 @@
         flex-direction: column;
         font-size: 14px;
       }
+
+      paper-slider {
+        flex-grow: 5;
+      }
+
+      paper-input {
+        font-size: 14px;
+      }
     </style>
   </template>
   <script>
@@ -65,10 +84,10 @@
 
     Polymer({
       is: "arrays-card",
+
       properties: {
         run: String,
         tag: String,
-
         /** @type {Function} */
         _colorScaleFunction: {
           type: Object,  // function: string => string
