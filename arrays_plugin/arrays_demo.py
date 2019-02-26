@@ -17,13 +17,12 @@ def run_all(logdir):
     writer2 = tf.summary.FileWriter(os.path.join(logdir, "run2"))
 
     for i in range(10):
-        qtable = np.random.rand(20, 10)
-        summary = arrays_summary.pb(tag="qtable", data=qtable)
-        writer1.add_summary(summary, global_step=i)
-
-    qtable = np.random.rand(10, 5)
-    summary = arrays_summary.pb(tag="qtable", data=qtable)
-    writer2.add_summary(summary, global_step=0)
+        qtable1 = np.random.rand(20, 10)
+        qtable2 = np.random.rand(10, 5)
+        summary1 = arrays_summary.pb(tag="qtable", data=qtable1)
+        summary2 = arrays_summary.pb(tag="qtable", data=qtable2)
+        writer1.add_summary(summary1, global_step=i)
+        writer2.add_summary(summary2, global_step=i)
 
     writer1.close()
     writer2.close()

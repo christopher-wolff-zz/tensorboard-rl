@@ -20,18 +20,6 @@
       color="[[_runColor]]"
     ></vz-rectangle-plot>
     <div id="options">
-      <div id="step-label">Step</div>
-      <paper-slider
-        pin
-        id="slider"
-        label="Step"
-        type="number"
-        min="{{minStep}}"
-        max="{{maxStep}}"
-        value="{{step}}"
-        immediate-value="{{_immediateStep}}"
-        <!-- on-change="_updateArray" -->
-      ></paper-slider>
       <paper-input
         label="Rows"
         always-float-label
@@ -51,10 +39,24 @@
         value="{{colIndices}}"
         on-change="_updateArray"
       ></paper-input>
+      <template is="dom-if" if="{{_multipleSteps}}">
+        <div id="step-label">Step</div>
+        <paper-slider
+          pin
+          id="slider"
+          label="Step"
+          type="number"
+          min="{{minStep}}"
+          max="{{maxStep}}"
+          value="{{step}}"
+          immediate-value="{{_immediateStep}}"
+        ></paper-slider>
+      </template>
     </div>
     <style>
       :host {
         margin: 5px;
+        margin-right: 10px;
         display: block;
         width: 480px;
         --color: #000000;
@@ -77,6 +79,7 @@
       #options {
         display: flex;
         flex-direction: row;
+        width: 480px;
       }
 
       #step-label {
@@ -87,8 +90,7 @@
       }
 
       #options paper-slider {
-        width: 360px;
-        flex-grow: 3;
+        width: 400px;
         --paper-slider-active-color: var(--color);
         --paper-slider-knob-color: var(--color);
         --paper-slider-knob-start-border-color: var(--color);
@@ -124,7 +126,11 @@
         },
         maxStep: {
           type: Number,
-          value: 10,
+          value: 0,
+        },
+        _multipleSteps: {
+          type: Boolean,
+          value: false,
         },
         rowIndices: String,
         colIndices: String,
@@ -181,6 +187,15 @@
             return;
           }
           const backendData = result.value;
+
+          // Check if we need to draw slider
+          this._multipleSteps = backendData.length > 1;
+          if (!this._multipleSteps) {
+            this._data = backendData;
+            this._updateArray();
+            return;
+          }
+
           // Compute min and max step values
           let minStep = Number.POSITIVE_INFINITY;
           let maxStep = Number.NEGATIVE_INFINITY;
@@ -188,7 +203,7 @@
             if (d.step < minStep) minStep = d.step;
             if (d.step > maxStep) maxStep = d.step;
           }
-           // This causes problems but would be nice
+          // This causes problems but would be nice
           // this.minStep = minStep;
           this.maxStep = maxStep;
           this._data = backendData;
@@ -205,9 +220,9 @@
         let step = this._immediateStep ? this._immediateStep : this.step;
 
         // Fetch array at correct time step
-        let array;
+        let array = this._data[0].array;
         for (const d of this._data) {
-          if (d.step == step) array = d.array;
+          if (d.step === step) array = d.array;
         }
 
         // Compute indices to show
