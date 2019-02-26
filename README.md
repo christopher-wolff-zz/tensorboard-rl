@@ -24,3 +24,7 @@ bazel run //tensorboard_rl -- --logdir=/tmp/arrays_demo
 ```
 
 Finally, navigate to `localhost:6006` in your browser to see the demo!
+
+## Preview
+
+![](./imgs/arrays-preview.png)
