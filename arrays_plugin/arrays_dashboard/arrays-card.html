@@ -4,24 +4,32 @@
 <link rel="import" href="../../tf-card-heading/tf-card-heading.html">
 <link rel="import" href="../../tf-color-scale/tf-color-scale.html">
 <link rel="import" href="../../tf-imports/lodash.html">
+<link rel="import" href="../../tf-imports/plottable.html">
 <link rel="import" href="vz-rectangle-plot.html">
 
 
 <dom-module id="arrays-card">
   <template>
-    <tf-card-heading title="[[tag]]" run="[[run]]" color="[[_runColor]]">
-    </tf-card-heading>
-    <vz-rectangle-plot array="[[array]]"></vz-rectangle-plot>
+    <tf-card-heading
+      title="[[tag]]"
+      run="[[run]]"
+      color="[[_runColor]]"
+    ></tf-card-heading>
+    <vz-rectangle-plot
+      array="[[array]]"
+      color="[[_runColor]]"
+    ></vz-rectangle-plot>
     <div id="options">
       <div id="step-label">Step</div>
       <paper-slider
         pin
         id="slider"
         label="Step"
-        min="0"
-        max="100"
         type="number"
+        min="{{minStep}}"
+        max="{{maxStep}}"
         value="{{step}}"
+        on-change="_updateArray"
       ></paper-slider>
       <paper-input
         label="Rows"
@@ -41,17 +49,24 @@
     </div>
     <style>
       :host {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        height: 235px;
-        margin-right: 10px;
-        margin-bottom: 15px;
+        margin: 5px;
+        display: block;
+        width: 480px;
+        --color: #000000;
       }
 
-      :host[_expanded] {
+      /* :host[_expanded] {
         width: 100%;
-        height: 500px;
+      } */
+
+      tf-card-heading {
+        display: block;
+        margin-bottom: 10px;
+      }
+
+      vz-rectangle-plot {
+        height: 360px;
+        width: 100%;
       }
 
       #options {
@@ -66,8 +81,20 @@
         font-size: 14px;
       }
 
-      paper-slider {
-        flex-grow: 5;
+      #options paper-slider {
+        width: 360px;
+        flex-grow: 3;
+        --paper-slider-active-color: var(--color);
+        --paper-slider-knob-color: var(--color);
+        --paper-slider-knob-start-border-color: var(--color);
+        --paper-slider-knob-start-color: var(--color);
+        --paper-slider-markers-color: var(--color);
+        --paper-slider-pin-color: var(--color);
+        --paper-slider-pin-start-color: var(--color);
+      }
+
+      #options paper-input {
+        --paper-input-container-focus-color: var(--color);
       }
 
       paper-input {
@@ -84,8 +111,17 @@
       properties: {
         run: String,
         tag: String,
+        step: Number,
+        minStep: {
+          type: Number,
+          value: 0,
+        },
+        maxStep: {
+          type: Number,
+          value: 10,
+        },
+        data: Object,
         array: Object,
-        /** @type {Function} */
         _colorScaleFunction: {
           type: Object,  // function: string => string
           value: () => tf_color_scale.runsColorScale,
@@ -103,6 +139,10 @@
 
       observers: ["_fetchNewData(run, tag)"],
 
+      ready() {
+        this._updateColors(this._runColor);
+      },
+
       attached() {
         // Defer reloading until after we're attached, because that ensures that
         // the requestManager has been set from above. (Polymer is tricky
@@ -112,6 +152,7 @@
       },
 
       reload() {
+        this._updateColors(this._runColor);
         this._fetchNewData(this.run, this.tag);
       },
 
@@ -129,9 +170,36 @@
             return;
           }
           const backendData = result.value;
-          this.array = backendData[0].array;
+          // Compute min and max step values
+          let minStep = Number.POSITIVE_INFINITY;
+          let maxStep = Number.NEGATIVE_INFINITY;
+          for (const d of backendData) {
+            if (d.step < minStep) minStep = d.step;
+            if (d.step > maxStep) maxStep = d.step;
+          }
+          // this.minStep = minStep;
+          this.maxStep = maxStep;
+          this.data = backendData;
+          this._updateArray();
         });
         this.requestManager.request(url).then(updateData);
+      },
+
+      _updateArray() {
+        console.log("Update array for step ", this.step);
+        let array;
+        for (const d of this.data) {
+          if (d.step == this.step) array = d.array;
+        }
+        console.log(array);
+        if (array) {
+          this.array = array;
+        }
+      },
+
+      _updateColors(runColor) {
+        this.customStyle['--color'] = runColor;
+        this.updateStyles();
       },
 
       _computeRunColor(run) {

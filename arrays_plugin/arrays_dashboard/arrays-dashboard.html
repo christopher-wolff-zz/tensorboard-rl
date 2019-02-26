@@ -45,7 +45,7 @@
               >
                 <template is="dom-repeat" items="[[category._pages]]" as="page">
                   <template is="dom-if" if="[[page.active]]">
-                    <div class="layout vertical">
+                    <div class="layout horizontal wrap">
                       <template is="dom-repeat" items="[[page.items]]">
                         <arrays-card
                           run="[[item.run]]"

@@ -16,29 +16,21 @@ def run_all(logdir):
     writer1 = tf.summary.FileWriter(os.path.join(logdir, "run1"))
     writer2 = tf.summary.FileWriter(os.path.join(logdir, "run2"))
 
-    q1 = np.array([[1., 2., 3.], [5., 4., 6.]])
+    q1 = np.random.rand(10, 5)
     s1 = arrays_summary.pb(tag="qtable", data=q1)
-    writer1.add_summary(s1, global_step=1)
+    writer1.add_summary(s1, global_step=0)
 
-    q2 = np.array([[2., 2., 2.], [2., 2., 2.]])
-    s2 = arrays_summary.pb(tag="qtable", data=q2)
-    writer1.add_summary(s2, global_step=2)
-
-    q3 = np.array([[3., 3., 3.], [3., 3., 3.]])
-    s3 = arrays_summary.pb(tag="qtable", data=q3)
-    writer1.add_summary(s3, global_step=3)
-
-    q4 = np.array([[2., 1. ,5.], [3., 6., 4.]])
+    q4 = np.random.rand(100, 50)
     s4 = arrays_summary.pb(tag="qtable", data=q4)
-    writer2.add_summary(s4, global_step=1)
+    writer2.add_summary(s4, global_step=0)
 
-    q5 = np.array([[2., 2., 2.], [2., 2., 2.]])
+    q5 = np.random.rand(100, 50)
     s5 = arrays_summary.pb(tag="qtable", data=q5)
-    writer2.add_summary(s5, global_step=2)
+    writer2.add_summary(s5, global_step=1)
 
-    q6 = np.array([[3., 3., 3.], [3., 3., 3.]])
+    q6 = np.random.rand(100, 50)
     s6 = arrays_summary.pb(tag="qtable", data=q6)
-    writer2.add_summary(s6, global_step=3)
+    writer2.add_summary(s6, global_step=2)
 
     writer1.close()
     writer2.close()

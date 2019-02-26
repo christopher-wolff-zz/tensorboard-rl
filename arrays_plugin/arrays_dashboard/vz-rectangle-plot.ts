@@ -13,11 +13,19 @@ Polymer({
   properties: {
     array: Object,
 
-    colorScale: {
+    color: {
       type: Object,
-      value: function() {
-        return new Plottable.Scales.Color().range(d3.schemeCategory10);
-      }
+      value: null,
+    },
+
+    /**
+     * A number between 0 and 1 that controls the range of the color scale used for
+     * the plot. A value of 0 results in all colors being the same, whereas a value
+     * of 1 results in a range from #ffffff to `color`.
+     */
+    colorRangeDepth: {
+      type: Number,
+      value: 0.8,
     },
 
     /**
@@ -46,7 +54,7 @@ Polymer({
           {
             title: 'Value',
             evaluate: function(d) {
-              return d.val;
+              return d.val.toFixed(2);
             },
           },
         ];
@@ -58,7 +66,7 @@ Polymer({
   },
 
   observers: [
-    '_makePlot(array, colorScale, tooltipColumns, _attached)',
+    '_makePlot(array, color, colorRangeDepth, tooltipColumns, _attached)',
   ],
 
   /**
@@ -89,13 +97,13 @@ Polymer({
    * Creates a plot, and asynchronously renders it. Fires a plot-rendered
    * event after the plot is rendered.
    */
-  _makePlot: function(array, colorScale, tooltipColumns, _attached) {
+  _makePlot: function(array, color, colorRangeDepth, tooltipColumns, _attached) {
     if (this._plot) this._plot.destroy();
     var tooltip = d3.select(this.$.tooltip);
     // We directly reference properties of `this` because this call is
     // asynchronous, and values may have changed in between the call being
     // initiated and actually being run.
-    var plot = new RectanglePlot(this.array, this.colorScale, tooltip, this.tooltipColumns);
+    var plot = new RectanglePlot(this.array, this.color, this.colorRangeDepth, tooltip, this.tooltipColumns);
     var div = d3.select(this.$.plotdiv);
     plot.renderTo(div);
     this._plot = plot;
@@ -105,18 +113,21 @@ Polymer({
 class RectanglePlot {
   private array: Array<Array<number>>;
   private cells: Cell[];
-  private colorScale: Plottable.Scales.Color;
+  private color: string;
+  private colorRangeDepth: number;
   private tooltip: d3.Selection<any, any, any, any>;
   private outer: Plottable.Components.Table;
   private plot: Plottable.Plots.Rectangle<string, string>;
 
   constructor(
       array: Array<Array<number>>,
-      colorScale: Plottable.Scales.Color,
+      color: string,
+      colorRangeDepth: number,
       tooltip: d3.Selection<any, any, any, any>,
       tooltipColumns: vz_chart_helpers.TooltipColumn[]) {
     this.array = array;
-    this.colorScale = colorScale;
+    this.color = color;
+    this.colorRangeDepth = colorRangeDepth;
     this.tooltip = tooltip;
 
     this.plot = null;
@@ -129,22 +140,21 @@ class RectanglePlot {
       }
     }
 
-    this.buildPlot(this.cells);
+    this.buildPlot(this.cells, color, colorRangeDepth);
     this.setupTooltips(tooltipColumns);
   }
 
-  private buildPlot(cells: Cell[]) {
+  private buildPlot(cells: Cell[], color: string, colorRangeDepth: number) {
     if (this.outer) {
       this.outer.destroy();
     }
-    // TODO: Compute color scale dynamically from parameter
-    const colorScale = new Plottable.Scales.InterpolatedColor();
-    colorScale.range(["#BDCEF0", "#5279C7"]);
+
+    const colorScale = this.computeColorScale(color, colorRangeDepth);
 
     const xScale = new Plottable.Scales.Category();
     const yScale = new Plottable.Scales.Category();
 
-    const xAxis = new Plottable.Axes.Category(xScale, "bottom");
+    const xAxis = new Plottable.Axes.Category(xScale, "top");
     const yAxis = new Plottable.Axes.Category(yScale, "left");
 
     const plot = new Plottable.Plots.Rectangle<string, string>()
@@ -154,7 +164,7 @@ class RectanglePlot {
       .attr("fill", (d) => d.val, colorScale);
 
     this.plot = plot;
-    this.outer = new Plottable.Components.Table([[yAxis, plot], [null, xAxis]]);
+    this.outer = new Plottable.Components.Table([[null, xAxis], [yAxis, plot]]);
   }
 
   private setupTooltips(tooltipColumns: vz_chart_helpers.TooltipColumn[]) {
@@ -189,17 +199,16 @@ class RectanglePlot {
     const hoveredCells = this.cells.filter(cell =>
       cell.x == target.datum.x && cell.y == target.datum.y
     );  // should have length 1, but data binding requires this to be a list
-    console.log(hoveredCells);
 
     // Bind the cells data structure to the tooltip.
     const rows = this.tooltip.select('tbody')
-                   .html('')
-                   .selectAll('tr')
-                   .data(hoveredCells)
-                   .enter()
-                   .append('tr');
+      .html('')
+      .selectAll('tr')
+      .data(hoveredCells)
+      .enter()
+      .append('tr');
 
-    // rows.style('white-space', 'nowrap');
+    rows.style('white-space', 'nowrap');
     _.each(tooltipColumns, (column) => {
       rows.append('td').text((d) => {
         // Convince TypeScript to let us pass off a key-value entry of value
@@ -226,6 +235,33 @@ class RectanglePlot {
 
   public destroy() {
     this.outer.destroy();
+  }
+
+  private computeColorScale(color: string, colorRangeDepth: number) {
+    const colorRgb = this.hexToRgb(color);
+    const r = Math.floor(colorRgb.r + (255 - colorRgb.r) * colorRangeDepth);
+    const g = Math.floor(colorRgb.g + (255 - colorRgb.g) * colorRangeDepth);
+    const b = Math.floor(colorRgb.b + (255 - colorRgb.b) * colorRangeDepth);
+    const startColor = this.rgbToHex(r, g, b);
+    return new Plottable.Scales.InterpolatedColor().range([startColor, color]);
+  }
+
+  private componentToHex(c) {
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+  }
+
+  private rgbToHex(r, g, b) {
+    return "#" + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b);
+  }
+
+  private hexToRgb(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : null;
   }
 }
 

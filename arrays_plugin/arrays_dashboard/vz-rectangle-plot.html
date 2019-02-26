@@ -28,18 +28,29 @@
         position: relative;
         outline: none;
       }
+
       div {
         -webkit-user-select: none;
         -moz-user-select: none;
         flex-grow: 1;
         flex-shrink: 1;
       }
+
       td {
         padding-left: 5px;
         padding-right: 5px;
         font-size: 13px;
         opacity: 1;
       }
+
+      #plotdiv .main {
+        cursor: crosshair;
+      }
+
+      #plotdiv:hover {
+        will-change: transform;
+      }
+
       #tooltip {
         pointer-events: none;
         position: absolute;
@@ -53,8 +64,9 @@
         padding: 8px;
         z-index: 5;
         cursor: none;
-        margin-top: 10px;
+        margin-top: 75px;
       }
+
       .swatch {
         border-radius: 50%;
         width: 14px;
@@ -62,9 +74,11 @@
         display: block;
         border: 2px solid rgba(0, 0, 0, 0);
       }
+
       .closest .swatch {
         border: 2px solid white;
       }
+
       th {
         padding-left: 5px;
         padding-right: 5px;
