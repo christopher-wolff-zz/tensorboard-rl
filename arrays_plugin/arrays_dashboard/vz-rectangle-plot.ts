@@ -11,7 +11,7 @@ export interface Cell {
 Polymer({
   is: 'vz-rectangle-plot',
   properties: {
-    array: Object,
+    data: Object,
 
     color: {
       type: Object,
@@ -66,7 +66,7 @@ Polymer({
   },
 
   observers: [
-    '_makePlot(array, color, colorRangeDepth, tooltipColumns, _attached)',
+    '_makePlot(data, color, colorRangeDepth, tooltipColumns, _attached)',
   ],
 
   /**
@@ -97,13 +97,13 @@ Polymer({
    * Creates a plot, and asynchronously renders it. Fires a plot-rendered
    * event after the plot is rendered.
    */
-  _makePlot: function(array, color, colorRangeDepth, tooltipColumns, _attached) {
+  _makePlot: function(data, color, colorRangeDepth, tooltipColumns, _attached) {
     if (this._plot) this._plot.destroy();
     var tooltip = d3.select(this.$.tooltip);
     // We directly reference properties of `this` because this call is
     // asynchronous, and values may have changed in between the call being
     // initiated and actually being run.
-    var plot = new RectanglePlot(this.array, this.color, this.colorRangeDepth, tooltip, this.tooltipColumns);
+    var plot = new RectanglePlot(this.data, this.color, this.colorRangeDepth, tooltip, this.tooltipColumns);
     var div = d3.select(this.$.plotdiv);
     plot.renderTo(div);
     this._plot = plot;
@@ -111,8 +111,7 @@ Polymer({
 });
 
 class RectanglePlot {
-  private array: Array<Array<number>>;
-  private cells: Cell[];
+  private data: Cell[];
   private color: string;
   private colorRangeDepth: number;
   private tooltip: d3.Selection<any, any, any, any>;
@@ -120,12 +119,12 @@ class RectanglePlot {
   private plot: Plottable.Plots.Rectangle<string, string>;
 
   constructor(
-      array: Array<Array<number>>,
+      data: Cell[],
       color: string,
       colorRangeDepth: number,
       tooltip: d3.Selection<any, any, any, any>,
       tooltipColumns: vz_chart_helpers.TooltipColumn[]) {
-    this.array = array;
+    this.data = data;
     this.color = color;
     this.colorRangeDepth = colorRangeDepth;
     this.tooltip = tooltip;
@@ -133,18 +132,18 @@ class RectanglePlot {
     this.plot = null;
     this.outer = null;
 
-    this.cells = [];
-    for (let i = 0; i < array.length; i++) {
-      for (let j = 0; j < array[0].length; j++) {
-        this.cells.push({"x": i, "y": j, "val": array[i][j]});
-      }
-    }
+    // this.cells = [];
+    // for (let i = 0; i < array.length; i++) {
+    //   for (let j = 0; j < array[0].length; j++) {
+    //     this.cells.push({"x": i, "y": j, "val": array[i][j]});
+    //   }
+    // }
 
-    this.buildPlot(this.cells, color, colorRangeDepth);
+    this.buildPlot(data, color, colorRangeDepth);
     this.setupTooltips(tooltipColumns);
   }
 
-  private buildPlot(cells: Cell[], color: string, colorRangeDepth: number) {
+  private buildPlot(data: Cell[], color: string, colorRangeDepth: number) {
     if (this.outer) {
       this.outer.destroy();
     }
@@ -158,7 +157,7 @@ class RectanglePlot {
     const yAxis = new Plottable.Axes.Category(yScale, "left");
 
     const plot = new Plottable.Plots.Rectangle<string, string>()
-      .addDataset(new Plottable.Dataset(this.cells))
+      .addDataset(new Plottable.Dataset(data))
       .x((d) => d.x, xScale)
       .y((d) => d.y, yScale)
       .attr("fill", (d) => d.val, colorScale);
@@ -196,11 +195,11 @@ class RectanglePlot {
   private drawTooltips(
       target: Plottable.Plots.IPlotEntity,
       tooltipColumns: vz_chart_helpers.TooltipColumn[]) {
-    const hoveredCells = this.cells.filter(cell =>
+    const hoveredCells = this.data.filter(cell =>
       cell.x == target.datum.x && cell.y == target.datum.y
     );  // should have length 1, but data binding requires this to be a list
 
-    // Bind the cells data structure to the tooltip.
+    // Bind the data to the tooltip
     const rows = this.tooltip.select('tbody')
       .html('')
       .selectAll('tr')

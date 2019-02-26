@@ -16,7 +16,7 @@
       color="[[_runColor]]"
     ></tf-card-heading>
     <vz-rectangle-plot
-      array="[[array]]"
+      data="[[_arrayData]]"
       color="[[_runColor]]"
     ></vz-rectangle-plot>
     <div id="options">
@@ -120,8 +120,8 @@
           type: Number,
           value: 10,
         },
-        data: Object,
-        array: Object,
+        _data: Object,
+        _arrayData: Object,
         _colorScaleFunction: {
           type: Object,  // function: string => string
           value: () => tf_color_scale.runsColorScale,
@@ -179,21 +179,27 @@
           }
           // this.minStep = minStep;
           this.maxStep = maxStep;
-          this.data = backendData;
+          this._data = backendData;
           this._updateArray();
         });
         this.requestManager.request(url).then(updateData);
       },
 
       _updateArray() {
-        console.log("Update array for step ", this.step);
         let array;
-        for (const d of this.data) {
+        for (const d of this._data) {
           if (d.step == this.step) array = d.array;
         }
-        console.log(array);
-        if (array) {
-          this.array = array;
+
+        const arrayData = [];
+        for (let i = 0; i < array.length; i++) {
+          for (let j = 0; j < array[0].length; j++) {
+            arrayData.push({"x": i, "y": j, "val": array[i][j]});
+          }
+        }
+
+        if (arrayData) {
+          this._arrayData = arrayData;
         }
       },
 
