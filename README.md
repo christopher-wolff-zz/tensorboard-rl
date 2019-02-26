@@ -1,10 +1,8 @@
 # TensorBoard RL
 
 An extension of TensorBoard that includes a suite of plugins for reinforcement
-learning.
-
-Currently, this only includes a plugin called Matrices, which lets you visualize
-arbitrary 2D tensors as a heat map.
+learning. Currently, this only includes a plugin called Matrices, which lets you
+visualize arbitrary 2D tensors as heat maps.
 
 ## Usage
 
