@@ -11,9 +11,7 @@
   <template>
     <tf-card-heading title="[[tag]]" run="[[run]]" color="[[_runColor]]">
     </tf-card-heading>
-    <div id="rectangle-plot-container">
-      <vz-rectangle-plot data="[[this.array]]"></vz-rectangle-plot>
-    </div>
+    <vz-rectangle-plot array="[[array]]"></vz-rectangle-plot>
     <div id="options">
       <div id="step-label">Step</div>
       <paper-slider
@@ -86,6 +84,7 @@
       properties: {
         run: String,
         tag: String,
+        array: Object,
         /** @type {Function} */
         _colorScaleFunction: {
           type: Object,  // function: string => string
@@ -130,7 +129,7 @@
             return;
           }
           const backendData = result.value;
-          this.array = backendData;
+          this.array = backendData[0].array;
         });
         this.requestManager.request(url).then(updateData);
       },
