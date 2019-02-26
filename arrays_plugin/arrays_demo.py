@@ -16,21 +16,14 @@ def run_all(logdir):
     writer1 = tf.summary.FileWriter(os.path.join(logdir, "run1"))
     writer2 = tf.summary.FileWriter(os.path.join(logdir, "run2"))
 
-    q1 = np.random.rand(10, 5)
-    s1 = arrays_summary.pb(tag="qtable", data=q1)
-    writer1.add_summary(s1, global_step=0)
+    for i in range(10):
+        qtable = np.random.rand(20, 10)
+        summary = arrays_summary.pb(tag="qtable", data=qtable)
+        writer1.add_summary(summary, global_step=i)
 
-    q4 = np.random.rand(100, 50)
-    s4 = arrays_summary.pb(tag="qtable", data=q4)
-    writer2.add_summary(s4, global_step=0)
-
-    q5 = np.random.rand(100, 50)
-    s5 = arrays_summary.pb(tag="qtable", data=q5)
-    writer2.add_summary(s5, global_step=1)
-
-    q6 = np.random.rand(100, 50)
-    s6 = arrays_summary.pb(tag="qtable", data=q6)
-    writer2.add_summary(s6, global_step=2)
+    qtable = np.random.rand(10, 5)
+    summary = arrays_summary.pb(tag="qtable", data=qtable)
+    writer2.add_summary(summary, global_step=0)
 
     writer1.close()
     writer2.close()

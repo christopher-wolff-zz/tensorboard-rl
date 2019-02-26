@@ -132,13 +132,6 @@ class RectanglePlot {
     this.plot = null;
     this.outer = null;
 
-    // this.cells = [];
-    // for (let i = 0; i < array.length; i++) {
-    //   for (let j = 0; j < array[0].length; j++) {
-    //     this.cells.push({"x": i, "y": j, "val": array[i][j]});
-    //   }
-    // }
-
     this.buildPlot(data, color, colorRangeDepth);
     this.setupTooltips(tooltipColumns);
   }

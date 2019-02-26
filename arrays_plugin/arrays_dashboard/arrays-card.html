@@ -29,22 +29,27 @@
         min="{{minStep}}"
         max="{{maxStep}}"
         value="{{step}}"
-        on-change="_updateArray"
+        immediate-value="{{_immediateStep}}"
+        <!-- on-change="_updateArray" -->
       ></paper-slider>
       <paper-input
         label="Rows"
         always-float-label
         placeholder="e.g. 0, 1, 2"
-        auto-validate pattern="^[0-9]+(,\s?[0-9]+)*$"
+        auto-validate pattern="^\s*([0-9]+|[0-9]+\s*:\s*[0-9]+)\s*(,\s*([0-9]+|[0-9]+\s*:\s*[0-9]+)\s*)*$"
         error-message="invalid format"
+        value="{{rowIndices}}"
+        on-change="_updateArray"
       ></paper-input>
       <div style="width: 20px"></div>
       <paper-input
         label="Columns"
         always-float-label
         placeholder="e.g. 0, 1, 2"
-        auto-validate pattern="^[0-9]+(,\s?[0-9]+)*$"
+        auto-validate pattern="^\s*([0-9]+|[0-9]+\s*:\s*[0-9]+)\s*(,\s*([0-9]+|[0-9]+\s*:\s*[0-9]+)\s*)*$"
         error-message="invalid format"
+        value="{{colIndices}}"
+        on-change="_updateArray"
       ></paper-input>
     </div>
     <style>
@@ -112,6 +117,7 @@
         run: String,
         tag: String,
         step: Number,
+        _immediateStep: Number,
         minStep: {
           type: Number,
           value: 0,
@@ -120,6 +126,8 @@
           type: Number,
           value: 10,
         },
+        rowIndices: String,
+        colIndices: String,
         _data: Object,
         _arrayData: Object,
         _colorScaleFunction: {
@@ -137,7 +145,10 @@
         },
       },
 
-      observers: ["_fetchNewData(run, tag)"],
+      observers: [
+        "_fetchNewData(run, tag)",
+        "_updateArray(step, _immediateStep)",
+      ],
 
       ready() {
         this._updateColors(this._runColor);
@@ -177,6 +188,7 @@
             if (d.step < minStep) minStep = d.step;
             if (d.step > maxStep) maxStep = d.step;
           }
+           // This causes problems but would be nice
           // this.minStep = minStep;
           this.maxStep = maxStep;
           this._data = backendData;
@@ -185,16 +197,31 @@
         this.requestManager.request(url).then(updateData);
       },
 
-      _updateArray() {
-        let array;
-        for (const d of this._data) {
-          if (d.step == this.step) array = d.array;
+      _updateArray() {  // using properties instead of params in case they update
+        if (!this._data) {
+          return;
         }
 
+        let step = this._immediateStep ? this._immediateStep : this.step;
+
+        // Fetch array at correct time step
+        let array;
+        for (const d of this._data) {
+          if (d.step == step) array = d.array;
+        }
+
+        // Compute indices to show
+        const rows = this._parseIndexPattern(this.rowIndices);
+        const cols = this._parseIndexPattern(this.colIndices);
+
+        // Slice array and convert into required data format
         const arrayData = [];
         for (let i = 0; i < array.length; i++) {
           for (let j = 0; j < array[0].length; j++) {
-            arrayData.push({"x": i, "y": j, "val": array[i][j]});
+            if ((rows.size === 0 || rows.has(j)) &&
+                (cols.size === 0 || cols.has(i))) {
+              arrayData.push({"x": i, "y": j, "val": array[i][j]});
+            }
           }
         }
 
@@ -210,6 +237,33 @@
 
       _computeRunColor(run) {
         return this._colorScaleFunction(run);
+      },
+
+      _parseIndexPattern(patterns, dim) {
+        const indices = new Set();
+        patterns = patterns.trim()
+        if (!patterns) {
+          return indices;
+        }
+        for (const pattern of patterns.split(",")) {
+          const numColons = (pattern.match(/:/g) || []).length;
+          if (numColons === 0) {
+            const num = parseInt(pattern.trim());
+            indices.add(num);
+          } else {
+            const parts = pattern.split(":");
+            const start = parseInt(parts[0].trim());
+            const end = parseInt(parts[1].trim());
+            for (let i = start; i <= end; i++) {
+              indices.add(i);
+            }
+          }
+        }
+        return indices;
+      },
+
+      _onSliderChange() {
+        console.log("Change callback");
       },
     });
   </script>
