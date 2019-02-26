@@ -5,14 +5,14 @@ load("@org_tensorflow_tensorboard//tensorboard/defs:web.bzl", "tf_web_library")
 licenses(["notice"])  # Apache 2.0
 
 tf_web_library(
-    name = "arrays_dashboard",
+    name = "matrices_dashboard",
     srcs = [
-        "arrays-card.html",
-        "arrays-dashboard.html",
-        "vz-rectangle-plot.html",
-        "vz-rectangle-plot.ts",
+        "matrices-card.html",
+        "matrices-dashboard.html",
+        "vz-matrix-plot.html",
+        "vz-matrix-plot.ts",
     ],
-    path = "/arrays_plugin/arrays_dashboard",
+    path = "/matrices_plugin/matrices_dashboard",
     deps = [
         "@org_polymer_iron_icon",
         "@org_polymer_paper_icon_button",

@@ -1,4 +1,4 @@
-namespace vz_rectangle_plot {
+namespace vz_matrix_plot {
 
 
 export interface Cell {
@@ -9,7 +9,7 @@ export interface Cell {
 
 
 Polymer({
-  is: 'vz-rectangle-plot',
+  is: 'vz-matrix-plot',
   properties: {
     data: Object,
 
@@ -103,14 +103,14 @@ Polymer({
     // We directly reference properties of `this` because this call is
     // asynchronous, and values may have changed in between the call being
     // initiated and actually being run.
-    var plot = new RectanglePlot(this.data, this.color, this.colorRangeDepth, tooltip, this.tooltipColumns);
+    var plot = new MatrixPlot(this.data, this.color, this.colorRangeDepth, tooltip, this.tooltipColumns);
     var div = d3.select(this.$.plotdiv);
     plot.renderTo(div);
     this._plot = plot;
   },
 });
 
-class RectanglePlot {
+class MatrixPlot {
   private data: Cell[];
   private color: string;
   private colorRangeDepth: number;
@@ -257,4 +257,4 @@ class RectanglePlot {
   }
 }
 
-} // namespace vz_rectangle_plot
+} // namespace vz_matrix_plot

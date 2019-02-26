@@ -1,10 +1,10 @@
-"""TensorBoard summary methods for the Arrays plugin."""
+"""TensorBoard summary methods for the Matrices plugin."""
 
 import numpy as np
 import tensorflow as tf
 
 
-PLUGIN_NAME = 'arrays'
+PLUGIN_NAME = 'matrices'
 
 
 def op(name, data, display_name=None, description=None, collections=None):
@@ -44,7 +44,7 @@ def op(name, data, display_name=None, description=None, collections=None):
 
 
 def pb(tag, data, display_name=None, description=None):
-    """Create a summary for the given array.
+    """Create a summary for the given matrix.
 
     Args:
         tag: A unique name for the generated summary.

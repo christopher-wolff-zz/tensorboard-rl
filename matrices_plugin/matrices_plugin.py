@@ -5,13 +5,13 @@ from tensorboard.plugins import base_plugin
 from werkzeug import wrappers
 
 
-class ArraysPlugin(base_plugin.TBPlugin):
-    """A TensorBoard plugin to visualize Q-tables."""
+class MatricesPlugin(base_plugin.TBPlugin):
+    """A TensorBoard plugin to visualize matrices."""
 
-    plugin_name = 'arrays'
+    plugin_name = 'matrices'
 
     def __init__(self, context):
-        """Instantiate an ArraysPlugin.
+        """Instantiate a MatricesPlugin.
 
         Args:
             context: A base_plugin.TBContext instance.
@@ -31,7 +31,7 @@ class ArraysPlugin(base_plugin.TBPlugin):
         """
         if not self._multiplexer:
             return False
-        return bool(self._multiplexer.PluginRunToTagToContent(ArraysPlugin.plugin_name))
+        return bool(self._multiplexer.PluginRunToTagToContent(MatricesPlugin.plugin_name))
 
     def get_plugin_apps(self):
         """Get all routes offered by the plugin.
@@ -42,7 +42,7 @@ class ArraysPlugin(base_plugin.TBPlugin):
         """
         return {
             '/tags': self.tags_route,
-            '/arrays': self.arrays_route
+            '/matrices': self.matrices_route
         }
 
     @wrappers.Request.application
@@ -56,13 +56,13 @@ class ArraysPlugin(base_plugin.TBPlugin):
             A JSON object that maps from runs to tag lists.
 
         """
-        runs = self._multiplexer.PluginRunToTagToContent(ArraysPlugin.plugin_name)
+        runs = self._multiplexer.PluginRunToTagToContent(MatricesPlugin.plugin_name)
         response = {run: list(tagToContent.keys()) for (run, tagToContent) in runs.items()}
         return http_util.Respond(request, response, 'application/json')
 
     @wrappers.Request.application
-    def arrays_route(self, request):
-        """Get the arrays associated with a run and tag.
+    def matrices_route(self, request):
+        """Get the matrices associated with a run and tag.
 
         Args:
             request: A `Request` object with args `run` and `tag`.
@@ -82,9 +82,9 @@ class ArraysPlugin(base_plugin.TBPlugin):
     @staticmethod
     def _process_tensor_event(event):
         """Convert a TensorEvent into a JSON-compatible response."""
-        array = tf.make_ndarray(event.tensor_proto).tolist()
+        matrix = tf.make_ndarray(event.tensor_proto).tolist()
         return {
             'step': event.step,
             'wall_time': event.wall_time,
-            'array': array
+            'matrix': matrix
         }

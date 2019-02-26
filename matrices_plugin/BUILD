@@ -3,8 +3,8 @@ package(default_visibility = ["//visibility:public"])
 licenses(["notice"])  # Apache 2.0
 
 py_library(
-    name = "arrays_plugin",
-    srcs = ["arrays_plugin.py"],
+    name = "matrices_plugin",
+    srcs = ["matrices_plugin.py"],
     srcs_version = "PY2AND3",
     deps = [
         "@org_pocoo_werkzeug",
@@ -16,14 +16,14 @@ py_library(
 )
 
 py_binary(
-    name = "arrays_demo",
-    srcs = ["arrays_demo.py"],
+    name = "matrices_demo",
+    srcs = ["matrices_demo.py"],
     srcs_version = "PY2AND3",
-    deps = [":arrays_summary"],
+    deps = [":matrices_summary"],
 )
 
 py_library(
-    name = "arrays_summary",
-    srcs = ["arrays_summary.py"],
+    name = "matrices_summary",
+    srcs = ["matrices_summary.py"],
     srcs_version = "PY2AND3",
 )

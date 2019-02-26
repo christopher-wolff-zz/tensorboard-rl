@@ -11,7 +11,7 @@ py_binary(
     main = "main.py",
     srcs_version = "PY2AND3",
     deps = [
-        "//arrays_plugin",
+        "//matrices_plugin",
         "@org_pocoo_werkzeug",
         "@org_tensorflow_tensorboard//tensorboard:default",
         "@org_tensorflow_tensorboard//tensorboard:program",
@@ -23,7 +23,7 @@ tf_web_library(
     srcs = ["index.html"],
     path = "/",
     deps = [
-        "//arrays_plugin/arrays_dashboard:arrays_dashboard",
+        "//matrices_plugin/matrices_dashboard:matrices_dashboard",
         "@org_tensorflow_tensorboard//tensorboard/components/tf_imports:webcomponentsjs",
         "@org_tensorflow_tensorboard//tensorboard/components/tf_tensorboard",
         "@org_tensorflow_tensorboard//tensorboard/components/tf_tensorboard:default_plugins",

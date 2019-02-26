@@ -5,10 +5,10 @@ import os.path
 import numpy as np
 import tensorflow as tf
 
-import arrays_summary
+import matrices_summary
 
 
-LOGDIR = '/tmp/arrays_demo'
+LOGDIR = '/tmp/matrices_demo'
 
 
 def run_all(logdir):
@@ -19,8 +19,8 @@ def run_all(logdir):
     for i in range(10):
         qtable1 = np.random.rand(20, 10)
         qtable2 = np.random.rand(10, 5)
-        summary1 = arrays_summary.pb(tag="qtable", data=qtable1)
-        summary2 = arrays_summary.pb(tag="qtable", data=qtable2)
+        summary1 = matrices_summary.pb(tag="qtable", data=qtable1)
+        summary2 = matrices_summary.pb(tag="qtable", data=qtable2)
         writer1.add_summary(summary1, global_step=i)
         writer2.add_summary(summary2, global_step=i)
 
