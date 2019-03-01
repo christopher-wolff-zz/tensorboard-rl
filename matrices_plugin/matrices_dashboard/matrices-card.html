@@ -118,7 +118,10 @@
       properties: {
         run: String,
         tag: String,
-        step: Number,
+        step: {
+          type: Number,
+          value: 0,
+        },
         _immediateStep: Number,
         minStep: {
           type: Number,
@@ -212,7 +215,8 @@
         this.requestManager.request(url).then(updateData);
       },
 
-      _updateMatrix() {  // using properties instead of params in case they update
+      _updateMatrix(unusedStep, unusedImmediateStep) {  // using properties instead of params in case they update
+        console.log("Updating matrix...");
         if (!this._data) {
           return;
         }
@@ -220,9 +224,14 @@
         let step = this._immediateStep ? this._immediateStep : this.step;
 
         // Fetch matrix at correct time step
-        let matrix = this._data[0].matrix;
+        let matrix;
+        let minDist = Number.MAX_SAFE_INTEGER;
         for (const d of this._data) {
-          if (d.step === step) matrix = d.matrix;
+          const dist = Math.abs(d.step - step);
+          if (dist <= minDist) {
+            matrix = d.matrix;
+            minDist = dist;
+          }
         }
 
         // Compute indices to show
